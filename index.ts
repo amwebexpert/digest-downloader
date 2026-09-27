@@ -55,7 +55,7 @@ const KNOWN_CODES: ReadonlySet<string> = new Set([
   "InvalidConfig",
 ]);
 
-function translateError(err: unknown): DownloaderError {
+const translateError = (err: unknown): DownloaderError => {
   const message = err instanceof Error ? err.message : String(err);
   const separatorIndex = message.indexOf(": ");
   if (separatorIndex > 0) {
@@ -65,7 +65,7 @@ function translateError(err: unknown): DownloaderError {
     }
   }
   return new DownloaderError("Unknown", message);
-}
+};
 
 export class Downloader {
   #native = new NativeDownloader();

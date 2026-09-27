@@ -27,11 +27,9 @@ const REALM_DEFAULT = "digest-downloader-test";
 const NONCE = randomBytes(16).toString("hex");
 const KNOWN_BODY = Buffer.from("x".repeat(4096), "utf8");
 
-function md5(input: string): string {
-  return createHash("md5").update(input).digest("hex");
-}
+const md5 = (input: string): string => createHash("md5").update(input).digest("hex");
 
-function parseAuthorization(header: string | undefined): Record<string, string> | undefined {
+const parseAuthorization = (header: string | undefined): Record<string, string> | undefined => {
   if (!header || !header.startsWith("Digest ")) return undefined;
   const params: Record<string, string> = {};
   const re = /(\w+)=(?:"([^"]*)"|([^\s,]+))/g;
@@ -40,23 +38,23 @@ function parseAuthorization(header: string | undefined): Record<string, string> 
     params[match[1]] = match[2] ?? match[3];
   }
   return params;
-}
+};
 
-function verifyDigest(
+const verifyDigest = (
   params: Record<string, string>,
   method: string,
   user: DigestUser,
   realm: string,
-): boolean {
+): boolean => {
   const ha1 = md5(`${user.username}:${realm}:${user.password}`);
   const ha2 = md5(`${method}:${params.uri}`);
   const expected = md5(
     `${ha1}:${params.nonce}:${params.nc}:${params.cnonce}:${params.qop}:${ha2}`,
   );
   return expected === params.response;
-}
+};
 
-export async function startTestServer(opts: TestServerOptions): Promise<TestServerHandle> {
+export const startTestServer = async (opts: TestServerOptions): Promise<TestServerHandle> => {
   const realm = opts.realm ?? REALM_DEFAULT;
   const flakyThreshold = opts.flakyFailuresBeforeSuccess ?? 2;
 
@@ -64,17 +62,17 @@ export async function startTestServer(opts: TestServerOptions): Promise<TestServ
   const authedCounts = new Map<string, number>();
   const flakyAuthedHits = { count: 0 };
 
-  function bump(counts: Map<string, number>, path: string) {
+  const bump = (counts: Map<string, number>, path: string) => {
     counts.set(path, (counts.get(path) ?? 0) + 1);
-  }
+  };
 
-  function challenge(res: ServerResponse) {
+  const challenge = (res: ServerResponse) => {
     const header = `Digest realm="${realm}", qop="auth", nonce="${NONCE}", algorithm=MD5`;
     res.writeHead(401, { "WWW-Authenticate": header });
     res.end();
-  }
+  };
 
-  function authenticate(req: IncomingMessage, path: string): DigestUser | undefined {
+  const authenticate = (req: IncomingMessage, path: string): DigestUser | undefined => {
     const params = parseAuthorization(req.headers.authorization);
     if (!params) {
       bump(probeCounts, path);
@@ -87,7 +85,7 @@ export async function startTestServer(opts: TestServerOptions): Promise<TestServ
     }
     bump(authedCounts, path);
     return user;
-  }
+  };
 
   const server: Server = createServer((req, res) => {
     const url = new URL(req.url ?? "/", "http://localhost");
@@ -168,4 +166,4 @@ export async function startTestServer(opts: TestServerOptions): Promise<TestServ
     authedRequestCount: (path) => authedCounts.get(path) ?? 0,
     close: () => new Promise((resolve, reject) => server.close((err) => (err ? reject(err) : resolve()))),
   };
-}
+};

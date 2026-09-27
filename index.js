@@ -16,7 +16,7 @@ const KNOWN_CODES = new Set([
     "Cancelled",
     "InvalidConfig",
 ]);
-function translateError(err) {
+const translateError = (err) => {
     const message = err instanceof Error ? err.message : String(err);
     const separatorIndex = message.indexOf(": ");
     if (separatorIndex > 0) {
@@ -26,7 +26,7 @@ function translateError(err) {
         }
     }
     return new DownloaderError("Unknown", message);
-}
+};
 export class Downloader {
     #native = new NativeDownloader();
     async download(options) {
