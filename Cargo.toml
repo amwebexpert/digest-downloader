@@ -1,0 +1,25 @@
+[package]
+name = "digest-downloader"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "3", default-features = false, features = ["napi4", "async", "tokio_rt", "error_anyhow"] }
+napi-derive = "3"
+tokio = { version = "1", features = ["fs", "time", "rt-multi-thread", "macros", "sync", "io-util"] }
+tokio-util = "0.7"
+reqwest = { version = "0.13", default-features = false, features = ["stream", "rustls-native-certs"] }
+futures-util = "0.3"
+digest_auth = "0.3"
+thiserror = "2"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+strip = "symbols"

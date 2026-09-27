@@ -1,0 +1,38 @@
+{
+  "name": "digest-downloader",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "native/binding.js",
+    "native/binding.d.ts",
+    "native/package.json",
+    "native/*.node"
+  ],
+  "napi": {
+    "binaryName": "digest-downloader",
+    "targets": [
+      "aarch64-apple-darwin",
+      "x86_64-pc-windows-msvc"
+    ]
+  },
+  "scripts": {
+    "build": "napi build --platform --release --output-dir native --js binding.js --dts binding.d.ts",
+    "build:debug": "napi build --platform --output-dir native --js binding.js --dts binding.d.ts",
+    "build:ts": "tsc -p tsconfig.build.json",
+    "test": "tsx --test test/*.test.ts",
+    "test:watch": "tsx --test --watch test/*.test.ts",
+    "example": "tsx examples/download.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3",
+    "@types/node": "^24",
+    "tsx": "^4",
+    "typescript": "^5"
+  }
+}
