@@ -1,6 +1,7 @@
 - [digest-downloader](#digest-downloader)
   - [Requirements](#requirements)
   - [Build](#build)
+  - [Use it as a dependency in another Node.js project](#use-it-as-a-dependency-in-another-nodejs-project)
   - [Windows 11 build](#windows-11-build)
   - [Test](#test)
   - [Try it from the command line](#try-it-from-the-command-line)
@@ -28,6 +29,43 @@ bun run build   # compiles the Rust native addon into native/
 
 `bun run build` is required before running tests or the example — `tsx`
 transpiles/loads the TypeScript layer only, it does not compile Rust.
+
+## Use it as a dependency in another Node.js project
+
+This repo is public and ships its prebuilt native addon under `native/` — no
+Rust, MSVC, or bun required on the consumer machine.
+
+Add directly via `npm install`:
+
+```bash
+npm install github:amwebexpert/digest-downloader
+```
+
+Or pin a version/commit in `package.json`:
+
+```json
+{
+  "dependencies": {
+    "digest-downloader": "github:amwebexpert/digest-downloader#main"
+  }
+}
+```
+
+Replace `#main` with a tag (`#v0.1.0`) or commit SHA to pin a specific build.
+
+Use it:
+
+```ts
+import { Downloader } from "digest-downloader";
+```
+
+Notes:
+
+- `npm install` just copies files — no build step runs on install.
+- Only macOS (Apple Silicon, `darwin-arm64`) and Windows (`win32-x64-msvc`)
+  are built today. Installing on another OS/arch throws an "unsupported
+  platform" error at `require` time.
+- `yarn`/`pnpm` support the same `github:` shorthand.
 
 ## Windows 11 build
 
